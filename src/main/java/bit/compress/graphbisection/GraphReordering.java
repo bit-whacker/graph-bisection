@@ -1,6 +1,9 @@
 package bit.compress.graphbisection;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 /**
  * An implementation for the compression friendly graph reordering using graph bisection
@@ -52,7 +55,18 @@ public class GraphReordering {
     
     int s=0, e=(D.length-1);
     
+    System.out.println("Before Reordering");
+    printD();
     reorder(s, e);
+    System.out.println("After Reordering");
+    printD();
+  }
+  
+  private void printD(){
+    for(int v : D){
+      System.out.print( v + "\t");
+    }
+    System.out.println();
   }
   
   /**
@@ -80,7 +94,7 @@ public class GraphReordering {
    */
   public void bisection(int s, int m, int e) {
     for (int i = s; i <= e; i++) {
-      gains.put(D[i], computeMoveGain(D[i]));
+      gains.put(D[i], computeMoveGain(D[i], s, m, e));
     }
     //. sort v1, and v2 in desc order by gain
     sortByGainDesc(s, m, e);
@@ -93,6 +107,13 @@ public class GraphReordering {
     }
   }
   
+  private void printGain() {
+    for(int key : gains.keySet()){
+      System.out.println(key + " => " + gains.get(key));
+    }
+    
+  }
+
   /**
    * sorts left list v1, and right list v2 in DESC order by gain
    * <p>
@@ -145,9 +166,63 @@ public class GraphReordering {
    * @param v
    * @return double gain
    */
-  public double computeMoveGain(int v){
+  public double computeMoveGain(int v, int s, int m, int e){
     // TODO need to know how to compute move gain( if any one have idea plz share)
+    Integer[] queryNodes = fetchQueryNodes(v);
+    double moveGain = 0.0;
+    for(int q : queryNodes){
+      moveGain += computeCost(q, s, m, e);
+    }
+    return moveGain;
+  }
+  
+  private Integer[] fetchQueryNodes(int v) {
+    List<Integer> queryNodes = new ArrayList<Integer>();
+    for(Integer q : adjacencyList.keySet()){
+      Integer[] vlist = adjacencyList.get(q);
+      if(listHas(vlist, v)){
+        queryNodes.add(q);
+      }
+    }
+    Integer[] c = new Integer[queryNodes.size()];
+    return queryNodes.toArray(c);
+  }
+
+  private boolean listHas(Integer[] list, int v) {
+    for(Integer qv : list){
+      if(qv.intValue() == v)
+        return true;
+    }
+    return false;
+  }
+
+  public double computeCost(int q, int s, int m, int e){
+    int deg1 = getEdgeCount(q, s, m);
+    int deg2 = getEdgeCount(q, m+1, e);
     
-    return 0.0;
+    int n1 = (m-s) +1;
+    int n2 = (e-m) +2;
+    
+    double deg1Xlog = degXLog(deg1, n1);
+    double deg2Xlog = degXLog(deg2, n2);
+    
+    return (deg1Xlog + deg2Xlog);
+  }
+  
+  public int getEdgeCount(int q, int s, int e){
+    Integer[] qDataNodes = adjacencyList.get(q);
+    int deg = 0;
+    for(int v : qDataNodes){
+      for(int x = s; x <= e; x++){
+        if(D[x] == v){
+          deg++;
+        }
+      }
+    }
+    return deg;
+  }
+  public double degXLog(int deg, int n){
+    double nByDeg = ((double) n /(deg +1));
+    return deg * (Math.log(nByDeg));
   }
 }
