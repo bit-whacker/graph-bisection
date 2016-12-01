@@ -19,7 +19,20 @@ public class App {
       adjacencyList.put(3, new Integer[]{1, 2, 4});
       adjacencyList.put(4, new Integer[]{3});
       
+      
+      System.out.println("Before Reordering");
+      printD(D);
+      
       new GraphReordering(D, adjacencyList);
       
+      System.out.println("After Reordering");
+      printD(D);
+    }
+    
+    private static void printD(int[] D){
+      for(int v : D){
+        System.out.print( v + "\t");
+      }
+      System.out.println();
     }
 }

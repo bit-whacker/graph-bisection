@@ -1,7 +1,6 @@
 package bit.compress.graphbisection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,18 +54,7 @@ public class GraphReordering {
     
     int s=0, e=(D.length-1);
     
-    System.out.println("Before Reordering");
-    printD();
     reorder(s, e);
-    System.out.println("After Reordering");
-    printD();
-  }
-  
-  private void printD(){
-    for(int v : D){
-      System.out.print( v + "\t");
-    }
-    System.out.println();
   }
   
   /**
@@ -105,13 +93,6 @@ public class GraphReordering {
       }
       ++v;++u;
     }
-  }
-  
-  private void printGain() {
-    for(int key : gains.keySet()){
-      System.out.println(key + " => " + gains.get(key));
-    }
-    
   }
 
   /**
@@ -201,7 +182,7 @@ public class GraphReordering {
     int deg2 = getEdgeCount(q, m+1, e);
     
     int n1 = (m-s) +1;
-    int n2 = (e-m) +2;
+    int n2 = (e-(m+1)) +1;
     
     double deg1Xlog = degXLog(deg1, n1);
     double deg2Xlog = degXLog(deg2, n2);
